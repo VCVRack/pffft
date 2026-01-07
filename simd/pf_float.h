@@ -50,18 +50,12 @@
  * ARM NEON:
  * https://developer.arm.com/architectures/instruction-sets/simd-isas/neon/intrinsics
  *
- * Altivec:
- * https://www.nxp.com/docs/en/reference-manual/ALTIVECPIM.pdf
- * https://gcc.gnu.org/onlinedocs/gcc-4.9.2/gcc/PowerPC-AltiVec_002fVSX-Built-in-Functions.html
- * better one?
- *
  */
 
 typedef float vsfscalar;
 
 #include "pf_sse1_float.h"
 #include "pf_neon_float.h"
-#include "pf_altivec_float.h"
 
 #ifndef SIMD_SZ
 #  if !defined(PFFFT_SIMD_DISABLE)
