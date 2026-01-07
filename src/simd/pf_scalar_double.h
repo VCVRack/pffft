@@ -38,7 +38,7 @@
   fallback mode(s) for situations where SSE/AVX/NEON/Altivec are not available, use scalar mode instead
 */
 
-#if !defined(SIMD_SZ) && defined(PFFFT_SCALVEC_ENABLED)
+#if !defined(SIMD_SZ) && !defined(PFFFT_SIMD_DISABLE)
 #pragma message( __FILE__ ": double SCALAR4 macros are defined" )
 
 typedef struct {

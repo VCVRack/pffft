@@ -36,7 +36,7 @@
 /*
   ARM NEON support macros
 */
-#if !defined(PFFFT_SIMD_DISABLE) && defined(PFFFT_ENABLE_NEON) && (defined(__arm__) || defined(__aarch64__) || defined(__arm64__))
+#if !defined(SIMD_SZ) && !defined(PFFFT_SIMD_DISABLE) && defined(__ARM_NEON)
 #pragma message( __FILE__ ": ARM NEON macros are defined" )
 
 #  include <arm_neon.h>

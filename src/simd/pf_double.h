@@ -57,14 +57,6 @@ typedef double vsfscalar;
 #include "pf_avx_double.h"
 #include "pf_sse2_double.h"
 #include "pf_neon_double.h"
-
-#ifndef SIMD_SZ
-#  if !defined(PFFFT_SIMD_DISABLE)
-#    pragma message( "building double with simd disabled !" )
-#    define PFFFT_SIMD_DISABLE /* fallback to scalar code */
-#  endif
-#endif
-
 #include "pf_scalar_double.h"
 
 /* shortcuts for complex multiplcations */

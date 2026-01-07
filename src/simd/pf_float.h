@@ -56,14 +56,7 @@ typedef float vsfscalar;
 
 #include "pf_sse1_float.h"
 #include "pf_neon_float.h"
-
-#ifndef SIMD_SZ
-#  if !defined(PFFFT_SIMD_DISABLE)
-#    pragma message( "building float with simd disabled !" )
-#    define PFFFT_SIMD_DISABLE /* fallback to scalar code */
-#  endif
-#endif
-
+#include "pf_altivec_float.h"
 #include "pf_scalar_float.h"
 
 /* shortcuts for complex multiplcations */
