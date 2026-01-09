@@ -26,7 +26,7 @@
    Laboratory, the University Corporation for Atmospheric Research,
    nor the names of its sponsors or contributors may be used to
    endorse or promote products derived from this Software without
-   specific prior written permission.  
+   specific prior written permission.
 
    - Redistributions of source code must retain the above copyright
    notices, this list of conditions, and the disclaimer below.
@@ -49,13 +49,8 @@
 
    PFFFT : a Pretty Fast FFT.
 
-   This file is largerly based on the original FFTPACK implementation, modified in
+   This file is largely based on the original FFTPACK implementation, modified in
    order to take advantage of SIMD instructions of modern CPUs.
-*/
-
-/*
-  ChangeLog: 
-  - 2011/10/02, version 1: This is the very first release of this file.
 */
 
 #include "pffft.h"
@@ -65,6 +60,15 @@
 #  define COMPILER_MSVC
 #elif defined(__GNUC__)
 #  define COMPILER_GCC
+#endif
+
+#ifdef COMPILER_MSVC
+#  define _USE_MATH_DEFINES
+#  include <malloc.h>
+#elif defined(__MINGW32__) || defined(__MINGW64__)
+#  include <malloc.h>
+#else
+#  include <alloca.h>
 #endif
 
 #include <stdlib.h>
@@ -85,19 +89,62 @@
 #  define VLA_ARRAY_ON_STACK(type__, varname__, size__) type__ *varname__ = (type__*)_alloca(size__ * sizeof(type__))
 #endif
 
-
 #ifdef COMPILER_MSVC
 #pragma warning( disable : 4244 4305 4204 4456 )
 #endif
 
-/* 
-   vector support macros: the rest of the code is independant of
-   SSE/Altivec/NEON -- adding support for other platforms with 4-element
-   vectors should be limited to these macros 
-*/
+
+/* ==========================================================================
+ * Common Utility Functions
+ * ========================================================================== */
+
+/* SSE and co like 16-bytes aligned pointers
+ * with a 64-byte alignment, we are even aligned on L2 cache lines... */
+#define MALLOC_V4SF_ALIGNMENT 64
+#define EXTRA_BYTES_FOR_ALIGNMENT_AND_A_POINTER (MALLOC_V4SF_ALIGNMENT - 1 + sizeof(void*))
+
+static void *Valigned_malloc(size_t nb_bytes) {
+  void *p, *p0 = malloc(nb_bytes + EXTRA_BYTES_FOR_ALIGNMENT_AND_A_POINTER);
+  if (!p0) return (void *) 0;
+  p = (void *) (((uintptr_t) p0 + EXTRA_BYTES_FOR_ALIGNMENT_AND_A_POINTER) & (~((uintptr_t) (MALLOC_V4SF_ALIGNMENT-1))));
+  *((void **) p - 1) = p0;
+  return p;
+}
+
+static void Valigned_free(void *p) {
+  if (p) free(*((void **) p - 1));
+}
+
+static int next_power_of_two(int N) {
+  /* https://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2 */
+  unsigned v = N;
+  v--;
+  v |= v >> 1;
+  v |= v >> 2;
+  v |= v >> 4;
+  v |= v >> 8;
+  v |= v >> 16;
+  v++;
+  return v;
+}
+
+static int is_power_of_two(int N) {
+  /* https://graphics.stanford.edu/~seander/bithacks.html#DetermineIfPowerOf2 */
+  return N && !(N & (N - 1));
+}
+
+void *pffft_aligned_malloc(size_t nb_bytes) { return Valigned_malloc(nb_bytes); }
+void pffft_aligned_free(void *p) { Valigned_free(p); }
+int pffft_next_power_of_two(int N) { return next_power_of_two(N); }
+int pffft_is_power_of_two(int N) { return is_power_of_two(N); }
+
+
+/* ==========================================================================
+ * Single Precision (float) Implementation
+ * ========================================================================== */
+
 #include "simd/pf_float.h"
 
-/* have code comparable with this definition */
 #define SETUP_STRUCT               PFFFT_Setup
 #define FUNC_NEW_SETUP             pffft_new_setup
 #define FUNC_DESTROY               pffft_destroy_setup
@@ -128,7 +175,4 @@
 #define FUNC_COS  cosf
 #define FUNC_SIN  sinf
 
-
 #include "pffft_priv_impl.h"
-
-

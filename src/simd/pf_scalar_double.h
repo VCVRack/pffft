@@ -46,60 +46,60 @@ typedef struct {
   vsfscalar b;
   vsfscalar c;
   vsfscalar d;
-} v4sf;
+} vfloat;
 
 #  define SIMD_SZ 4
 
-typedef union v4sf_union {
-  v4sf  v;
+typedef union vfloat_union {
+  vfloat v;
   vsfscalar f[SIMD_SZ];
-} v4sf_union;
+} vfloat_union;
 
 #  define VARCH "4xScalar"
 #  define VREQUIRES_ALIGN 0
 
-  static ALWAYS_INLINE(v4sf) VZERO() {
-    v4sf r = { 0.f, 0.f, 0.f, 0.f };
+  static ALWAYS_INLINE(vfloat) VZERO() {
+    vfloat r = { 0.f, 0.f, 0.f, 0.f };
     return r;
   }
 
-  static ALWAYS_INLINE(v4sf) VMUL(v4sf A, v4sf B) {
-    v4sf r = { A.a * B.a, A.b * B.b, A.c * B.c, A.d * B.d };
+  static ALWAYS_INLINE(vfloat) VMUL(vfloat A, vfloat B) {
+    vfloat r = { A.a * B.a, A.b * B.b, A.c * B.c, A.d * B.d };
     return r;
   }
 
-  static ALWAYS_INLINE(v4sf) VADD(v4sf A, v4sf B) {
-    v4sf r = { A.a + B.a, A.b + B.b, A.c + B.c, A.d + B.d };
+  static ALWAYS_INLINE(vfloat) VADD(vfloat A, vfloat B) {
+    vfloat r = { A.a + B.a, A.b + B.b, A.c + B.c, A.d + B.d };
     return r;
   }
 
-  static ALWAYS_INLINE(v4sf) VMADD(v4sf A, v4sf B, v4sf C) {
-    v4sf r = { A.a * B.a + C.a, A.b * B.b + C.b, A.c * B.c + C.c, A.d * B.d + C.d };
+  static ALWAYS_INLINE(vfloat) VMADD(vfloat A, vfloat B, vfloat C) {
+    vfloat r = { A.a * B.a + C.a, A.b * B.b + C.b, A.c * B.c + C.c, A.d * B.d + C.d };
     return r;
   }
 
-  static ALWAYS_INLINE(v4sf) VSUB(v4sf A, v4sf B) {
-    v4sf r = { A.a - B.a, A.b - B.b, A.c - B.c, A.d - B.d };
+  static ALWAYS_INLINE(vfloat) VSUB(vfloat A, vfloat B) {
+    vfloat r = { A.a - B.a, A.b - B.b, A.c - B.c, A.d - B.d };
     return r;
   }
 
-  static ALWAYS_INLINE(v4sf) LD_PS1(vsfscalar v) {
-    v4sf r = { v, v, v, v };
+  static ALWAYS_INLINE(vfloat) LD_PS1(vsfscalar v) {
+    vfloat r = { v, v, v, v };
     return r;
   }
 
-#  define VLOAD_UNALIGNED(ptr)  (*((v4sf*)(ptr)))
+#  define VLOAD_UNALIGNED(ptr)  (*((vfloat*)(ptr)))
 
-#  define VLOAD_ALIGNED(ptr)    (*((v4sf*)(ptr)))
+#  define VLOAD_ALIGNED(ptr)    (*((vfloat*)(ptr)))
 
-#  define VALIGNED(ptr) ((((uintptr_t)(ptr)) & (sizeof(v4sf)-1) ) == 0)
+#  define VALIGNED(ptr) ((((uintptr_t)(ptr)) & (sizeof(vfloat)-1) ) == 0)
 
 
   /* INTERLEAVE2() */
   #define INTERLEAVE2( A, B, C, D) \
   do { \
-    v4sf Cr = { A.a, B.a, A.b, B.b }; \
-    v4sf Dr = { A.c, B.c, A.d, B.d }; \
+    vfloat Cr = { A.a, B.a, A.b, B.b }; \
+    vfloat Dr = { A.c, B.c, A.d, B.d }; \
     C = Cr; \
     D = Dr; \
   } while (0)
@@ -108,8 +108,8 @@ typedef union v4sf_union {
   /* UNINTERLEAVE2() */
   #define UNINTERLEAVE2(A, B, C, D) \
   do { \
-    v4sf Cr = { A.a, A.c, B.a, B.c }; \
-    v4sf Dr = { A.b, A.d, B.b, B.d }; \
+    vfloat Cr = { A.a, A.c, B.a, B.c }; \
+    vfloat Dr = { A.b, A.d, B.b, B.d }; \
     C = Cr; \
     D = Dr; \
   } while (0)
@@ -118,10 +118,10 @@ typedef union v4sf_union {
   /* VTRANSPOSE4() */
   #define VTRANSPOSE4(A, B, C, D) \
   do { \
-    v4sf Ar = { A.a, B.a, C.a, D.a }; \
-    v4sf Br = { A.b, B.b, C.b, D.b }; \
-    v4sf Cr = { A.c, B.c, C.c, D.c }; \
-    v4sf Dr = { A.d, B.d, C.d, D.d }; \
+    vfloat Ar = { A.a, B.a, C.a, D.a }; \
+    vfloat Br = { A.b, B.b, C.b, D.b }; \
+    vfloat Cr = { A.c, B.c, C.c, D.c }; \
+    vfloat Dr = { A.d, B.d, C.d, D.d }; \
     A = Ar; \
     B = Br; \
     C = Cr; \
@@ -130,21 +130,21 @@ typedef union v4sf_union {
 
 
   /* VSWAPHL() */
-  static ALWAYS_INLINE(v4sf) VSWAPHL(v4sf A, v4sf B) {
-    v4sf r = { B.a, B.b, A.c, A.d };
+  static ALWAYS_INLINE(vfloat) VSWAPHL(vfloat A, vfloat B) {
+    vfloat r = { B.a, B.b, A.c, A.d };
     return r;
   }
 
 
   /* reverse/flip all floats */
-  static ALWAYS_INLINE(v4sf) VREV_S(v4sf A) {
-    v4sf r = { A.d, A.c, A.b, A.a };
+  static ALWAYS_INLINE(vfloat) VREV_S(vfloat A) {
+    vfloat r = { A.d, A.c, A.b, A.a };
     return r;
   }
 
   /* reverse/flip complex floats */
-  static ALWAYS_INLINE(v4sf) VREV_C(v4sf A) {
-    v4sf r = { A.c, A.d, A.a, A.b };
+  static ALWAYS_INLINE(vfloat) VREV_C(vfloat A) {
+    vfloat r = { A.c, A.d, A.a, A.b };
     return r;
   }
 
@@ -155,14 +155,14 @@ typedef union v4sf_union {
 
 #if !defined(SIMD_SZ)
 #pragma message( __FILE__ ": float SCALAR1 macros are defined" )
-typedef vsfscalar v4sf;
+typedef vsfscalar vfloat;
 
 #  define SIMD_SZ 1
 
-typedef union v4sf_union {
-  v4sf  v;
+typedef union vfloat_union {
+  vfloat v;
   vsfscalar f[SIMD_SZ];
-} v4sf_union;
+} vfloat_union;
 
 #  define VARCH "Scalar"
 #  define VREQUIRES_ALIGN 0

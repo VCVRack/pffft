@@ -2,66 +2,11 @@
    Copyright (c) 2020  Hayati Ayguen ( h_ayguen@web.de )
    Copyright (c) 2020  Dario Mambro ( dario.mambro@gmail.com )
 
-   Based on original fortran 77 code from FFTPACKv4 from NETLIB
-   (http://www.netlib.org/fftpack), authored by Dr Paul Swarztrauber
-   of NCAR, in 1985.
-
-   As confirmed by the NCAR fftpack software curators, the following
-   FFTPACKv5 license applies to FFTPACKv4 sources. My changes are
-   released under the same terms.
-
-   FFTPACK license:
-
-   http://www.cisl.ucar.edu/css/software/fftpack5/ftpk.html
-
-   Copyright (c) 2004 the University Corporation for Atmospheric
-   Research ("UCAR"). All rights reserved. Developed by NCAR's
-   Computational and Information Systems Laboratory, UCAR,
-   www.cisl.ucar.edu.
-
-   Redistribution and use of the Software in source and binary forms,
-   with or without modification, is permitted provided that the
-   following conditions are met:
-
-   - Neither the names of NCAR's Computational and Information Systems
-   Laboratory, the University Corporation for Atmospheric Research,
-   nor the names of its sponsors or contributors may be used to
-   endorse or promote products derived from this Software without
-   specific prior written permission.  
-
-   - Redistributions of source code must retain the above copyright
-   notices, this list of conditions, and the disclaimer below.
-
-   - Redistributions in binary form must reproduce the above copyright
-   notice, this list of conditions, and the disclaimer below in the
-   documentation and/or other materials provided with the
-   distribution.
-
-   THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-   EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO THE WARRANTIES OF
-   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-   NONINFRINGEMENT. IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT
-   HOLDERS BE LIABLE FOR ANY CLAIM, INDIRECT, INCIDENTAL, SPECIAL,
-   EXEMPLARY, OR CONSEQUENTIAL DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-   ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE
-   SOFTWARE.
-
-
-   PFFFT : a Pretty Fast FFT.
-
-   This file is largerly based on the original FFTPACK implementation, modified in
-   order to take advantage of SIMD instructions of modern CPUs.
+   Double precision FFT implementation.
+   See pffft.c for license details.
 */
 
-/*
-   NOTE: This file is adapted from Julien Pommier's original PFFFT,
-   which works on 32 bit floating point precision using SSE instructions,
-   to work with 64 bit floating point precision using AVX instructions.
-   Author: Dario Mambro @ https://github.com/unevens/pffft
-*/
-
-#include "pffft_double.h"
+#include "pffft.h"
 
 /* detect compiler flavour */
 #if defined(_MSC_VER)
@@ -97,19 +42,12 @@
 #  define VLA_ARRAY_ON_STACK(type__, varname__, size__) type__ *varname__ = (type__*)_alloca(size__ * sizeof(type__))
 #endif
 
-
 #ifdef COMPILER_MSVC
 #pragma warning( disable : 4244 4305 4204 4456 )
 #endif
 
-/* 
-   vector support macros: the rest of the code is independant of
-   AVX -- adding support for other platforms with 4-element
-   vectors should be limited to these macros 
-*/
 #include "simd/pf_double.h"
 
-/* have code comparable with this definition */
 #define float double
 #define SETUP_STRUCT               PFFFTD_Setup
 #define FUNC_NEW_SETUP             pffftd_new_setup
@@ -141,7 +79,4 @@
 #define FUNC_COS  cos
 #define FUNC_SIN  sin
 
-
 #include "pffft_priv_impl.h"
-
-

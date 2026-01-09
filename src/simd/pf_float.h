@@ -37,35 +37,25 @@
 #include <string.h>
 #include <stdint.h>
 
-
-/*
- *  SIMD reference material:
- *
- * general SIMD introduction:
- * https://www.linuxjournal.com/content/introduction-gcc-compiler-intrinsics-vector-processing
- *
- * SSE 1:
- * https://software.intel.com/sites/landingpage/IntrinsicsGuide/
- *
- * ARM NEON:
- * https://developer.arm.com/architectures/instruction-sets/simd-isas/neon/intrinsics
- *
- */
-
 typedef float vsfscalar;
 
-#include "pf_sse1_float.h"
-#include "pf_neon_float.h"
-#include "pf_altivec_float.h"
+/* Use unified GCC vector extensions backend */
+#include "pf_gcc_vector.h"
+
+/* Scalar fallback if SIMD is disabled or unavailable */
 #include "pf_scalar_float.h"
 
-/* shortcuts for complex multiplcations */
-#define VCPLXMUL(ar,ai,br,bi) { v4sf tmp; tmp=VMUL(ar,bi); ar=VMUL(ar,br); ar=VSUB(ar,VMUL(ai,bi)); ai=VMUL(ai,br); ai=VADD(ai,tmp); }
-#define VCPLXMULCONJ(ar,ai,br,bi) { v4sf tmp; tmp=VMUL(ar,bi); ar=VMUL(ar,br); ar=VADD(ar,VMUL(ai,bi)); ai=VMUL(ai,br); ai=VSUB(ai,tmp); }
+/* shortcuts for complex multiplications (vector versions) */
+#define VCPLXMUL(ar,ai,br,bi) { vfloat tmp; tmp=VMUL(ar,bi); ar=VMUL(ar,br); ar=VSUB(ar,VMUL(ai,bi)); ai=VMUL(ai,br); ai=VADD(ai,tmp); }
+#define VCPLXMULCONJ(ar,ai,br,bi) { vfloat tmp; tmp=VMUL(ar,bi); ar=VMUL(ar,br); ar=VADD(ar,VMUL(ai,bi)); ai=VMUL(ai,br); ai=VSUB(ai,tmp); }
+
+/* scalar versions for non-SIMD code paths */
+#define VCPLXMUL_SCALAR(ar,ai,br,bi) { float _tmp_ = (ar)*(bi); (ar) = (ar)*(br) - (ai)*(bi); (ai) = (ai)*(br) + _tmp_; }
+#define VCPLXMULCONJ_SCALAR(ar,ai,br,bi) { float _tmp_ = (ar)*(bi); (ar) = (ar)*(br) + (ai)*(bi); (ai) = (ai)*(br) - _tmp_; }
+
 #ifndef SVMUL
 /* multiply a scalar with a vector */
 #define SVMUL(f,v) VMUL(LD_PS1(f),v)
 #endif
 
 #endif /* PF_FLT_H */
-

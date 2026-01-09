@@ -37,12 +37,7 @@
 
 namespace pffft {
 namespace detail {
-#if defined(PFFFT_ENABLE_FLOAT) || ( !defined(PFFFT_ENABLE_FLOAT) && !defined(PFFFT_ENABLE_DOUBLE) )
 #include "pffft.h"
-#endif
-#if defined(PFFFT_ENABLE_DOUBLE)
-#include "pffft_double.h"
-#endif
 }
 }
 
